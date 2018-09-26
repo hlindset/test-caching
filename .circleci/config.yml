@@ -80,14 +80,14 @@ jobs:
       - *restore_target_cache
 
       - run:
+          name: Show update
+          command: |
+            echo "show update" sbt
+
+      - run:
           name: Build project
           command: |
             sbt compile test:compile
-
-      - run:
-          name: Evicted
-          command: |
-            sbt evicted
 
       # Cleanup cache directories
       - run:
