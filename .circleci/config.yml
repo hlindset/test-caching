@@ -82,7 +82,7 @@ jobs:
       - run:
           name: Show update
           command: |
-            echo "show update" sbt
+            echo "show update" | sbt
 
       - run:
           name: Build project
