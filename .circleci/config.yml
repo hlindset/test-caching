@@ -142,3 +142,6 @@ workflows:
       - tests:
           requires:
             - build
+      - docker_stage_moduleb:
+          requires:
+            - build
