@@ -113,6 +113,27 @@ jobs:
           command: |
             sbt modulea/test moduleb/test
 
+  docker_stage_moduleb:
+    <<: *defaults
+
+    docker:
+      - image: circleci/openjdk:8-jdk
+
+    steps:
+      - *attach_workspace
+      - *restore_dependency_cache
+
+      # Build and save caches.
+      - run:
+          name: Stage subproject for docker build
+          command: |
+            sbt moduleb/docker:stage
+
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - moduleb/target/docker/stage/
+
 workflows:
   version: 2
   build_and_deploy:
