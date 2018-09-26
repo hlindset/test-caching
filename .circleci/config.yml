@@ -108,6 +108,9 @@ jobs:
       - image: hoopla/circleci2-scala-base-image
 
     steps:
+      - *attach_workspace
+      - *restore_dependency_cache
+
       - run:
           name: Run tests
           command: |
