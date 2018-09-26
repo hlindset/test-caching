@@ -62,7 +62,7 @@ jobs:
     <<: *defaults
 
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: hoopla/circleci2-scala-base-image
 
     steps:
       - checkout
@@ -105,7 +105,7 @@ jobs:
     <<: *defaults
 
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: hoopla/circleci2-scala-base-image
 
     steps:
       - run:
@@ -117,7 +117,7 @@ jobs:
     <<: *defaults
 
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: hoopla/circleci2-scala-base-image
 
     steps:
       - *attach_workspace
