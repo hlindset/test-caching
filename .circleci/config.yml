@@ -110,7 +110,8 @@ jobs:
     steps:
       - run:
           name: Run tests
-          command: sbt modulea/test moduleb/test
+          command: |
+            sbt modulea/test moduleb/test
 
   docker_stage_moduleb:
     <<: *defaults
