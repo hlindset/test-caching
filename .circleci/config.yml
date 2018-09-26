@@ -84,6 +84,11 @@ jobs:
           command: |
             sbt compile test:compile
 
+      - run:
+          name: Evicted
+          command: |
+            sbt evicted
+
       # Cleanup cache directories
       - run:
           name: Cleanup cache directories
