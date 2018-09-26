@@ -1,0 +1,147 @@
+version: 2
+
+defaults: &defaults
+  working_directory: /app
+  environment:
+    JAVA_OPTS: -XX:+AggressiveOpts -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+CMSClassUnloadingEnabled -XX:ReservedCodeCacheSize=128m -XX:SurvivorRatio=128 -XX:MaxTenuringThreshold=0 -XX:-EliminateAutoBox -Xms512M -Xmx1280M
+
+references:
+  workspace_root: &workspace_root
+    /app
+
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: *workspace_root
+
+  restore_dependency_cache: &restore_dependency_cache
+    restore_cache:
+      name: Restore dependency cache
+      keys:
+        # try exact match for current branch and build.sbt checksum
+        - v1-dependency-cache-{{ .Branch }}-{{ checksum "build.sbt" }}
+        # try master with matching build.sbt checksum
+        - v1-dependency-cache-master-{{ checksum "build.sbt" }}
+        # try most recent for current branch
+        - v1-dependency-cache-{{ .Branch }}
+        # fallback to most recent master
+        - v1-dependency-cache-master
+  restore_target_cache: &restore_target_cache
+    restore_cache:
+      name: Restore build cache
+      keys:
+        # try exact match for current branch and git revision
+        - v1-build-cache-{{ .Branch }}-{{ .Revision }}
+        # try most recent for current branch
+        - v1-build-cache-{{ .Branch }}
+        # fallback to most recent on master
+        - v1-build-cache-master
+
+  save_dependency_cache: &save_dependency_cache
+    save_cache:
+      name: Save dependency cache
+      key: v1-dependency-cache-{{ .Branch }}-{{ checksum "build.sbt" }}
+      paths:
+        - ~/.ivy2
+        - ~/.sbt
+        - ~/.m2
+        - ~/.cache/coursier
+        - ~/.coursier
+
+  save_target_cache: &save_target_cache
+    save_cache:
+      name: Save target cache
+      key: v1-build-cache-{{ .Branch }}-{{ .Revision }}
+      paths:
+        - target
+        - project/target
+        - modulea/target
+        - moduleb/target
+
+jobs:
+  build:
+    <<: *defaults
+
+    docker:
+      - image: hoopla/circleci2-scala-base-image
+
+    steps:
+      - checkout
+
+      - run:
+          name: Clear cache directories
+          command: |
+            rm -rf ~/.ivy2
+            rm -rf ~/.sbt
+            rm -rf ~/.m2
+            rm -rf ~/.cache/coursier
+            rm -rf ~/.coursier
+
+      - *restore_dependency_cache
+      - *restore_target_cache
+
+      - run:
+          name: Build project
+          command: |
+            sbt compile test:compile
+
+      # Cleanup cache directories
+      - run:
+          name: Cleanup cache directories
+          command: |
+            find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete || true
+            find $HOME/.sbt/cache -name "*.lock" -print -delete || true
+            find $HOME/.cache/coursier -name "ivydata-*.properties" -print -delete || true
+            find $HOME/.coursier -name "ivydata-*.properties" -print -delete || true
+
+      - *save_dependency_cache
+      - *save_target_cache
+
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - ./
+
+  tests:
+    <<: *defaults
+
+    docker:
+      - image: hoopla/circleci2-scala-base-image
+
+    - run:
+          name: Run tests
+          command: sbt modulea/test moduleb/test
+
+  docker_stage_moduleb:
+    <<: *defaults
+
+    docker:
+      - image: hoopla/circleci2-scala-base-image
+
+    steps:
+      - *attach_workspace
+      - *restore_dependency_cache
+
+      # Build and save caches.
+      - run:
+          name: Stage subproject for docker build
+          command: |
+            sbt moduleb/docker:stage
+
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - moduleb/target/docker/stage/
+
+workflows:
+  version: 2
+
+  build_and_deploy:
+    - build
+
+    - tests:
+        requires:
+          - build
+
+    docker_stage_moduleb:
+        requires:
+          - build
