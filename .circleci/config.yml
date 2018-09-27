@@ -117,14 +117,14 @@ jobs:
 
       # Build and save caches.
       - run:
-          name: Stage subproject for docker build
+          name: Run moduleb
           command: |
-            sbt moduleb/docker:stage
+            sbt moduleb/run
 
-      - persist_to_workspace:
-          root: *workspace_root
-          paths:
-            - moduleb/target/docker/stage/
+      # - persist_to_workspace:
+      #     root: *workspace_root
+      #     paths:
+      #       - moduleb/target/docker/stage/
 
 workflows:
   version: 2

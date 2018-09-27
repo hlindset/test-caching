@@ -5,7 +5,7 @@ import Dependencies._
 ThisBuild / name := "hoopla-finatra"
 ThisBuild / organization := "no.hoopla"
 ThisBuild / version := "2.0"
-ThisBuild / scalaVersion := "2.12.4"
+ThisBuild / scalaVersion := "2.12.6"
 
 // Cache dependency resolution
 // ThisBuild / updateOptions := updateOptions.value.withCachedResolution(true)
@@ -37,5 +37,5 @@ lazy val modulea = (project in file("modulea"))
 lazy val moduleb = (project in file("moduleb"))
   .dependsOn(modulea)
   .enablePlugins(
-    JavaAppPackaging
+    // JavaAppPackaging
   )
