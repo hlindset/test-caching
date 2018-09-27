@@ -66,20 +66,18 @@ jobs:
     steps:
       - checkout
 
-      - *restore_dependency_cache
-      - *restore_target_cache
-
-      - run:
-          name: foo
-          command: |
-            pwd
-            whoami
-            ls -la
+      # - *restore_dependency_cache
+      # - *restore_target_cache
 
       - run:
           name: Build project
           command: |
             sbt compile test:compile
+
+      - run:
+          name: Show file system
+          command: |
+            find /
 
       # Cleanup cache directories
       - run:
