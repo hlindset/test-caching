@@ -103,7 +103,7 @@ jobs:
       - run:
           name: Build project
           command: |
-            sbt compile test:compile
+            sbt compile test:compile modulea/compile modulea/test:compile moduleb/compile moduleb/test:compile
 
       - run:
           name: Show file system
