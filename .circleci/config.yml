@@ -77,6 +77,12 @@ jobs:
 
       # - *restore_dependency_cache
       # - *restore_target_cache
+      - run:
+          name: foo
+          command: |
+            pwd
+            whoami
+            ls -la
 
       - run:
           name: Build project
