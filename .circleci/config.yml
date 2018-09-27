@@ -15,63 +15,76 @@ references:
     attach_workspace:
       at: *workspace_root
 
+  save_sbt_cache: &save_sbt_cache
+    save_cache:
+      name: Save SBT cache
+      key: v3-cache-sbt-{{ .Branch }}
+      paths:
+        - ~/.sbt
+
+  save_dependency_cache: &save_dependency_cache
+    save_cache:
+      name: Save dependency cache
+      key: v3-cache-dependencies-{{ .Branch }}-{{ checksum "build.sbt" }}
+      paths:
+        - ~/.ivy2
+
+  save_app_target_cache: &save_app_target_cache
+    save_cache:
+      name: Save app target cache
+      key: v3-cache-build-app-{{ .Branch }}-{{ .Revision }}
+      paths:
+        - modulea/target
+        - moduleb/target
+
+  save_project_target_cache: &save_project_target_cache
+    save_cache:
+      name: Save project target cache
+      key: v3-cache-build-project-{{ .Branch }}-{{ .Revision }}
+      paths:
+        - project/target
+
   restore_sbt_cache: &restore_sbt_cache
     restore_cache:
       name: Restores SBT cache
       keys:
-        - v1-cache-sbt-{{ .Branch }}
-        - v1-cache-sbt-master
-
-  save_sbt_cache: &save_sbt_cache
-    save_cache:
-      name: Save SBT cache
-      key: v1-cache-sbt-{{ .Branch }}
-      paths:
-        - ~/.sbt
+        - v3-cache-sbt-{{ .Branch }}
+        - v3-cache-sbt-master
 
   restore_dependency_cache: &restore_dependency_cache
     restore_cache:
       name: Restore dependency cache
       keys:
         # try exact match for current branch and build.sbt checksum
-        - v2-cache-dependencies-{{ .Branch }}-{{ checksum "build.sbt" }}
+        - v3-cache-dependencies-{{ .Branch }}-{{ checksum "build.sbt" }}
         # try master with matching build.sbt checksum
-        - v2-cache-dependencies-master-{{ checksum "build.sbt" }}
+        - v3-cache-dependencies-master-{{ checksum "build.sbt" }}
         # try most recent for current branch
-        - v2-cache-dependencies-{{ .Branch }}
+        - v3-cache-dependencies-{{ .Branch }}
         # fallback to most recent master
-        - v2-cache-dependencies-master
-  restore_target_cache: &restore_target_cache
+        - v3-cache-dependencies-master
+
+  restore_app_target_cache: &restore_app_target_cache
     restore_cache:
-      name: Restore build cache
+      name: Restore app build cache
       keys:
         # try exact match for current branch and git revision
-        - v2-cache-build-{{ .Branch }}-{{ .Revision }}
+        - v3-cache-build-app-{{ .Branch }}-{{ .Revision }}
         # try most recent for current branch
-        - v2-cache-build-{{ .Branch }}
+        - v3-cache-build-app-{{ .Branch }}
         # fallback to most recent on master
-        - v2-cache-build-master
+        - v3-cache-build-app-master
 
-  save_dependency_cache: &save_dependency_cache
-    save_cache:
-      name: Save dependency cache
-      key: v2-cache-dependencies-{{ .Branch }}-{{ checksum "build.sbt" }}
-      paths:
-        - ~/.ivy2
-        - ~/.sbt
-        - ~/.m2
-        - ~/.cache/coursier
-        - ~/.coursier
-
-  save_target_cache: &save_target_cache
-    save_cache:
-      name: Save target cache
-      key: v2-cache-build-{{ .Branch }}-{{ .Revision }}
-      paths:
-        - target
-        - project/target
-        - modulea/target
-        - moduleb/target
+  restore_project_target_cache: &restore_project_target_cache
+    restore_cache:
+      name: Restore project build cache
+      keys:
+        # try exact match for current branch and git revision
+        - v3-cache-build-project-{{ .Branch }}-{{ .Revision }}
+        # try most recent for current branch
+        - v3-cache-build-project-{{ .Branch }}
+        # fallback to most recent on master
+        - v3-cache-build-project-master
 
 jobs:
   build:
@@ -80,9 +93,9 @@ jobs:
     steps:
       - checkout
 
-      # - *restore_dependency_cache
-      # - *restore_target_cache
       - *restore_sbt_cache
+      - *restore_dependency_cache
+      - *restore_project_target_cache
 
       - run:
           name: Build project
@@ -98,14 +111,12 @@ jobs:
       - run:
           name: Cleanup cache directories
           command: |
-            find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete || true
-            find $HOME/.sbt/cache -name "*.lock" -print -delete || true
-            find $HOME/.cache/coursier -name "ivydata-*.properties" -print -delete || true
-            find $HOME/.coursier -name "ivydata-*.properties" -print -delete || true
+            find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete || true
+            find $HOME/.sbt -name "*.lock" -print -delete || true
 
       - *save_sbt_cache
-      # - *save_dependency_cache
-      # - *save_target_cache
+      - *save_dependency_cache
+      - *save_project_target_cache
 
       - persist_to_workspace:
           root: *workspace_root
