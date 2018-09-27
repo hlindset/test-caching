@@ -20,28 +20,28 @@ references:
       name: Restore dependency cache
       keys:
         # try exact match for current branch and build.sbt checksum
-        - v1-dependency-cache-{{ .Branch }}-{{ checksum "build.sbt" }}
+        - v1-cache-dependencies-{{ .Branch }}-{{ checksum "build.sbt" }}
         # try master with matching build.sbt checksum
-        - v1-dependency-cache-master-{{ checksum "build.sbt" }}
+        - v1-cache-dependencies-master-{{ checksum "build.sbt" }}
         # try most recent for current branch
-        - v1-dependency-cache-{{ .Branch }}
+        - v1-cache-dependencies-{{ .Branch }}
         # fallback to most recent master
-        - v1-dependency-cache-master
+        - v1-cache-dependencies-master
   restore_target_cache: &restore_target_cache
     restore_cache:
       name: Restore build cache
       keys:
         # try exact match for current branch and git revision
-        - v1-build-cache-{{ .Branch }}-{{ .Revision }}
+        - v1-cache-build-{{ .Branch }}-{{ .Revision }}
         # try most recent for current branch
-        - v1-build-cache-{{ .Branch }}
+        - v1-cache-build-{{ .Branch }}
         # fallback to most recent on master
-        - v1-build-cache-master
+        - v1-cache-build-master
 
   save_dependency_cache: &save_dependency_cache
     save_cache:
       name: Save dependency cache
-      key: v1-dependency-cache-{{ .Branch }}-{{ checksum "build.sbt" }}
+      key: v1-cache-dependencies-{{ .Branch }}-{{ checksum "build.sbt" }}
       paths:
         - ~/.ivy2
         - ~/.sbt
@@ -52,7 +52,7 @@ references:
   save_target_cache: &save_target_cache
     save_cache:
       name: Save target cache
-      key: v1-build-cache-{{ .Branch }}-{{ .Revision }}
+      key: v1-cache-build-{{ .Branch }}-{{ .Revision }}
       paths:
         - target
         - project/target
@@ -66,17 +66,9 @@ jobs:
     steps:
       - checkout
 
-      # - run:
-      #     name: Clear cache directories
-      #     command: |
-      #       rm -rf ~/.ivy2
-      #       rm -rf ~/.sbt
-      #       rm -rf ~/.m2
-      #       rm -rf ~/.cache/coursier
-      #       rm -rf ~/.coursier
+      - *restore_dependency_cache
+      - *restore_target_cache
 
-      # - *restore_dependency_cache
-      # - *restore_target_cache
       - run:
           name: foo
           command: |
@@ -90,16 +82,16 @@ jobs:
             sbt compile test:compile
 
       # Cleanup cache directories
-      # - run:
-      #     name: Cleanup cache directories
-      #     command: |
-      #       find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete || true
-      #       find $HOME/.sbt/cache -name "*.lock" -print -delete || true
-      #       find $HOME/.cache/coursier -name "ivydata-*.properties" -print -delete || true
-      #       find $HOME/.coursier -name "ivydata-*.properties" -print -delete || true
+      - run:
+          name: Cleanup cache directories
+          command: |
+            find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete || true
+            find $HOME/.sbt/cache -name "*.lock" -print -delete || true
+            find $HOME/.cache/coursier -name "ivydata-*.properties" -print -delete || true
+            find $HOME/.coursier -name "ivydata-*.properties" -print -delete || true
 
-      # - *save_dependency_cache
-      # - *save_target_cache
+      - *save_dependency_cache
+      - *save_target_cache
 
       - persist_to_workspace:
           root: *workspace_root
@@ -111,7 +103,7 @@ jobs:
 
     steps:
       - *attach_workspace
-      # - *restore_dependency_cache
+      - *restore_dependency_cache
 
       - run:
           name: Run tests
@@ -123,7 +115,7 @@ jobs:
 
     steps:
       - *attach_workspace
-      # - *restore_dependency_cache
+      - *restore_dependency_cache
 
       # Build and save caches.
       - run:
