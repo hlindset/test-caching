@@ -66,17 +66,17 @@ jobs:
     steps:
       - checkout
 
-      - run:
-          name: Clear cache directories
-          command: |
-            rm -rf ~/.ivy2
-            rm -rf ~/.sbt
-            rm -rf ~/.m2
-            rm -rf ~/.cache/coursier
-            rm -rf ~/.coursier
+      # - run:
+      #     name: Clear cache directories
+      #     command: |
+      #       rm -rf ~/.ivy2
+      #       rm -rf ~/.sbt
+      #       rm -rf ~/.m2
+      #       rm -rf ~/.cache/coursier
+      #       rm -rf ~/.coursier
 
-      - *restore_dependency_cache
-      - *restore_target_cache
+      # - *restore_dependency_cache
+      # - *restore_target_cache
 
       - run:
           name: Build project
@@ -84,16 +84,16 @@ jobs:
             sbt compile test:compile
 
       # Cleanup cache directories
-      - run:
-          name: Cleanup cache directories
-          command: |
-            find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete || true
-            find $HOME/.sbt/cache -name "*.lock" -print -delete || true
-            find $HOME/.cache/coursier -name "ivydata-*.properties" -print -delete || true
-            find $HOME/.coursier -name "ivydata-*.properties" -print -delete || true
+      # - run:
+      #     name: Cleanup cache directories
+      #     command: |
+      #       find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete || true
+      #       find $HOME/.sbt/cache -name "*.lock" -print -delete || true
+      #       find $HOME/.cache/coursier -name "ivydata-*.properties" -print -delete || true
+      #       find $HOME/.coursier -name "ivydata-*.properties" -print -delete || true
 
-      - *save_dependency_cache
-      - *save_target_cache
+      # - *save_dependency_cache
+      # - *save_target_cache
 
       - persist_to_workspace:
           root: *workspace_root
@@ -105,7 +105,7 @@ jobs:
 
     steps:
       - *attach_workspace
-      - *restore_dependency_cache
+      # - *restore_dependency_cache
 
       - run:
           name: Run tests
@@ -117,7 +117,7 @@ jobs:
 
     steps:
       - *attach_workspace
-      - *restore_dependency_cache
+      # - *restore_dependency_cache
 
       # Build and save caches.
       - run:
