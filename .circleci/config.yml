@@ -20,28 +20,28 @@ references:
       name: Restore dependency cache
       keys:
         # try exact match for current branch and build.sbt checksum
-        - v1-cache-dependencies-{{ .Branch }}-{{ checksum "build.sbt" }}
+        - v2-cache-dependencies-{{ .Branch }}-{{ checksum "build.sbt" }}
         # try master with matching build.sbt checksum
-        - v1-cache-dependencies-master-{{ checksum "build.sbt" }}
+        - v2-cache-dependencies-master-{{ checksum "build.sbt" }}
         # try most recent for current branch
-        - v1-cache-dependencies-{{ .Branch }}
+        - v2-cache-dependencies-{{ .Branch }}
         # fallback to most recent master
-        - v1-cache-dependencies-master
+        - v2-cache-dependencies-master
   restore_target_cache: &restore_target_cache
     restore_cache:
       name: Restore build cache
       keys:
         # try exact match for current branch and git revision
-        - v1-cache-build-{{ .Branch }}-{{ .Revision }}
+        - v2-cache-build-{{ .Branch }}-{{ .Revision }}
         # try most recent for current branch
-        - v1-cache-build-{{ .Branch }}
+        - v2-cache-build-{{ .Branch }}
         # fallback to most recent on master
-        - v1-cache-build-master
+        - v2-cache-build-master
 
   save_dependency_cache: &save_dependency_cache
     save_cache:
       name: Save dependency cache
-      key: v1-cache-dependencies-{{ .Branch }}-{{ checksum "build.sbt" }}
+      key: v2-cache-dependencies-{{ .Branch }}-{{ checksum "build.sbt" }}
       paths:
         - ~/.ivy2
         - ~/.sbt
@@ -52,7 +52,7 @@ references:
   save_target_cache: &save_target_cache
     save_cache:
       name: Save target cache
-      key: v1-cache-build-{{ .Branch }}-{{ .Revision }}
+      key: v2-cache-build-{{ .Branch }}-{{ .Revision }}
       paths:
         - target
         - project/target
@@ -88,8 +88,8 @@ jobs:
             find $HOME/.cache/coursier -name "ivydata-*.properties" -print -delete || true
             find $HOME/.coursier -name "ivydata-*.properties" -print -delete || true
 
-      - *save_dependency_cache
-      - *save_target_cache
+      # - *save_dependency_cache
+      # - *save_target_cache
 
       - persist_to_workspace:
           root: *workspace_root
@@ -101,7 +101,7 @@ jobs:
 
     steps:
       - *attach_workspace
-      - *restore_dependency_cache
+      # - *restore_dependency_cache
 
       - run:
           name: Run tests
@@ -113,7 +113,7 @@ jobs:
 
     steps:
       - *attach_workspace
-      - *restore_dependency_cache
+      # - *restore_dependency_cache
 
       # Build and save caches.
       - run:
