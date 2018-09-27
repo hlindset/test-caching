@@ -18,7 +18,7 @@ references:
   save_sbt_cache: &save_sbt_cache
     save_cache:
       name: Save SBT cache
-      key: v3-cache-sbt-{{ .Branch }}
+      key: v3-cache-sbt-{{ .Branch }}-{{ .Revision }}
       paths:
         - ~/.sbt
 
@@ -48,7 +48,8 @@ references:
     restore_cache:
       name: Restores SBT cache
       keys:
-        - v3-cache-sbt-{{ .Branch }}
+        - v3-cache-sbt-{{ .Branch }}-{{ .Revision }}
+        - v3-cache-sbt-{{ .Branch }}-
         - v3-cache-sbt-master
 
   restore_dependency_cache: &restore_dependency_cache
@@ -60,7 +61,7 @@ references:
         # try master with matching build.sbt checksum
         - v3-cache-dependencies-master-{{ checksum "build.sbt" }}
         # try most recent for current branch
-        - v3-cache-dependencies-{{ .Branch }}
+        - v3-cache-dependencies-{{ .Branch }}-
         # fallback to most recent master
         - v3-cache-dependencies-master
 
@@ -71,7 +72,7 @@ references:
         # try exact match for current branch and git revision
         - v3-cache-build-app-{{ .Branch }}-{{ .Revision }}
         # try most recent for current branch
-        - v3-cache-build-app-{{ .Branch }}
+        - v3-cache-build-app-{{ .Branch }}-
         # fallback to most recent on master
         - v3-cache-build-app-master
 
@@ -82,7 +83,7 @@ references:
         # try exact match for current branch and git revision
         - v3-cache-build-project-{{ .Branch }}-{{ .Revision }}
         # try most recent for current branch
-        - v3-cache-build-project-{{ .Branch }}
+        - v3-cache-build-project-{{ .Branch }}-
         # fallback to most recent on master
         - v3-cache-build-project-master
 
