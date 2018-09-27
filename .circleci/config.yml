@@ -5,7 +5,7 @@ defaults: &defaults
   environment:
     JAVA_OPTS: -XX:+AggressiveOpts -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+CMSClassUnloadingEnabled -XX:ReservedCodeCacheSize=128m -XX:SurvivorRatio=128 -XX:MaxTenuringThreshold=0 -XX:-EliminateAutoBox -Xms512M -Xmx1280M
   docker:
-    - image: 8u181-jdk-stretch
+    - image: circleci/openjdk:8-jdk
 
 references:
   workspace_root: &workspace_root
