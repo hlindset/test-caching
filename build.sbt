@@ -9,6 +9,7 @@ ThisBuild / scalaVersion := "2.12.6"
 
 // Cache dependency resolution
 ThisBuild / updateOptions := updateOptions.value.withCachedResolution(true)
+ThisBuild / updateConfiguration := updateConfiguration.withMetadataDirectory(Some(Path.userHome / ".sbt" / "resolution" / "cache"))
 
 // Disable scaladoc/javadoc in docker:stage (sbt-native-packager)
 // ThisBuild / packageDoc / mappings := Seq()
