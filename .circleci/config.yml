@@ -96,6 +96,7 @@ jobs:
       - *restore_sbt_cache
       - *restore_dependency_cache
       - *restore_project_target_cache
+      - *restore_app_target_cache
 
       - run:
           name: Build project
@@ -117,6 +118,7 @@ jobs:
       - *save_sbt_cache
       - *save_dependency_cache
       - *save_project_target_cache
+      - *save_app_target_cache
 
       - persist_to_workspace:
           root: *workspace_root
@@ -132,6 +134,7 @@ jobs:
       - *restore_sbt_cache
       - *restore_dependency_cache
       - *restore_project_target_cache
+      - *restore_app_target_cache
 
       - run:
           name: Run tests
@@ -147,6 +150,7 @@ jobs:
       - *restore_sbt_cache
       - *restore_dependency_cache
       - *restore_project_target_cache
+      - *restore_app_target_cache
 
       # Build and save caches.
       - run:
