@@ -1,13 +1,15 @@
 version: 2
 
 defaults: &defaults
-  working_directory: /app
+  working_directory: $HOME/
   environment:
     JAVA_OPTS: -XX:+AggressiveOpts -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+CMSClassUnloadingEnabled -XX:ReservedCodeCacheSize=128m -XX:SurvivorRatio=128 -XX:MaxTenuringThreshold=0 -XX:-EliminateAutoBox -Xms512M -Xmx1280M
+  docker:
+    - image: 8u181-jdk-stretch
 
 references:
   workspace_root: &workspace_root
-    /app
+    $HOME/
 
   attach_workspace: &attach_workspace
     attach_workspace:
@@ -61,9 +63,6 @@ jobs:
   build:
     <<: *defaults
 
-    docker:
-      - image: hoopla/circleci2-scala-base-image
-
     steps:
       - checkout
 
@@ -109,9 +108,6 @@ jobs:
   tests:
     <<: *defaults
 
-    docker:
-      - image: hoopla/circleci2-scala-base-image
-
     steps:
       - *attach_workspace
       - *restore_dependency_cache
@@ -123,9 +119,6 @@ jobs:
 
   docker_stage_moduleb:
     <<: *defaults
-
-    docker:
-      - image: hoopla/circleci2-scala-base-image
 
     steps:
       - *attach_workspace
