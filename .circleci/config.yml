@@ -92,7 +92,7 @@ jobs:
       - run:
           name: Show file system
           command: |
-            find /
+            find ~/
 
       # Cleanup cache directories
       - run:
