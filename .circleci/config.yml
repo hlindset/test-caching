@@ -1,7 +1,7 @@
 version: 2
 
 defaults: &defaults
-  working_directory: $HOME/app
+  working_directory: ~/app
   environment:
     JAVA_OPTS: -XX:+AggressiveOpts -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+CMSClassUnloadingEnabled -XX:ReservedCodeCacheSize=128m -XX:SurvivorRatio=128 -XX:MaxTenuringThreshold=0 -XX:-EliminateAutoBox -Xms512M -Xmx1280M
   docker:
