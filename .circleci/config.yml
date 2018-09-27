@@ -128,7 +128,10 @@ jobs:
 
     steps:
       - *attach_workspace
-      # - *restore_dependency_cache
+
+      - *restore_sbt_cache
+      - *restore_dependency_cache
+      - *restore_project_target_cache
 
       - run:
           name: Run tests
@@ -140,7 +143,10 @@ jobs:
 
     steps:
       - *attach_workspace
-      # - *restore_dependency_cache
+
+      - *restore_sbt_cache
+      - *restore_dependency_cache
+      - *restore_project_target_cache
 
       # Build and save caches.
       - run:
