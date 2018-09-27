@@ -43,6 +43,7 @@ references:
       key: v3-cache-build-project-{{ .Branch }}-{{ .Revision }}
       paths:
         - project/target
+        - target
 
   restore_sbt_cache: &restore_sbt_cache
     restore_cache:
